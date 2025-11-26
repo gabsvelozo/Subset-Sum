@@ -39,3 +39,30 @@ Função SubsetSum(arr, target):
             dp[j] = dp[j] OU dp[j - x]
     
     Retornar dp[target]
+```
+---
+
+## 3. Análise de Complexidade
+
+A eficiência deste algoritmo depende não apenas da quantidade de números, mas também do valor da soma alvo (*target*).
+
+### ⏱️ Complexidade de Tempo
+Nossa implementação percorre todos os números e, para cada um, atualiza a tabela até o valor do *target*. Como não há interrupções antecipadas no código, o comportamento é consistente:
+
+- **Pior Caso (Big-O):** $O(N \cdot S)$
+- **Melhor Caso (Big-Ω):** $\Omega(N \cdot S)$
+- **Caso Médio (Big-Θ):** $\Theta(N \cdot S)$
+
+> **Onde:**
+> - $N$ = Quantidade de elementos no conjunto.
+> - $S$ = Valor da soma alvo (*target*).
+
+### 💾 Complexidade de Espaço
+Utilizamos um vetor unidimensional para armazenar os resultados parciais.
+- **Espaço:** $O(S)$ (Proporcional ao valor do *target*).
+
+### 🧠 Classificação do Problema (P vs NP)
+O problema *Subset Sum* é classicamente **NP-Completo**.
+- **Isso significa que:** Não se conhece um algoritmo que o resolva em tempo puramente polinomial ($O(N^k)$) para qualquer entrada.
+- **Sobre nossa solução:** Ela é considerada **Pseudo-Polinomial**. Ela é rápida para *targets* pequenos, mas se o *target* for um número gigantesco (exponencial em relação ao número de bits), o algoritmo se torna inviável.
+
