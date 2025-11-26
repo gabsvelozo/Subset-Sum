@@ -77,3 +77,36 @@ Este algoritmo é eficiente quando o valor da soma alvo ($S$) e o número de ele
 
 ### ❌ Contextos Ineficientes
 Se o alvo $S$ for muito grande (ex: $10^9$), o vetor `dp` consumirá muita memória e o tempo de execução será proibitivo, mesmo que $N$ seja pequeno. Isso ocorre porque a complexidade depende do valor numérico, tornando-o um algoritmo de tempo **pseudo-polinomial**.
+
+## 5. Análise de Casos (Melhor, Pior e Médio)
+
+A performance do algoritmo varia pouco devido à natureza da implementação baseada em preenchimento completo da tabela.
+
+- **Pior Caso:** $O(N \cdot S)$
+  - Ocorre quando precisamos preencher toda a tabela, o que é o padrão nesta implementação (sem otimizações de parada antecipada).
+- **Melhor Caso:** $O(N \cdot S)$
+  - Teoricamente, seria possível parar assim que `dp[target]` se tornasse `True`. No entanto, na implementação atual (tanto Java quanto Python), o laço percorre todos os itens para preencher a matriz. Portanto, o tempo de execução é consistente e previsível, sem variação significativa baseada na ordem dos dados.
+- **Caso Médio:** $O(N \cdot S)$
+  - Segue a mesma lógica, pois a estrutura dos laços é fixa e independente da sorte na distribuição dos números.
+
+---
+
+## 6. Reflexão Final (Classe P vs NP)
+
+O problema **Subset Sum** pertence à classe **NP-Completo**.
+
+### ❓ É classe P?
+**Não se sabe.**
+Se $P \neq NP$ (a conjectura mais aceita na ciência da computação), então não existe algoritmo que resolva este problema em tempo polinomial em relação ao *tamanho da entrada* (número de bits).
+
+### 🚀 Por que a solução parece rápida?
+A solução apresentada é **Pseudo-Polinomial**.
+- Ela é polinomial em relação ao *valor* da soma ($S$).
+- Porém, é exponencial em relação ao *número de bits* necessários para representar $S$. Se dobrarmos o número de bits do target (por exemplo, de 1 milhão para 1 trilhão), o tempo de execução aumenta drasticamente, tornando-a inviável para números muito grandes.
+
+### 🔗 Contexto Teórico
+- **Versão NP:** A versão de decisão ("existe um subconjunto?") é a que define a classe NP-Completo.
+- **Problemas Semelhantes:**
+  - **Problema da Mochila (Knapsack Problem):** Maximização de valor com limite de peso.
+  - **Problema da Partição (Partition Problem):** Dividir um conjunto em dois com mesma soma.
+  - Ambos também são NP-completos e frequentemente resolvidos com técnicas similares de Programação Dinâmica.
