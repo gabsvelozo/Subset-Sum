@@ -135,4 +135,3 @@ A solução apresentada é **Pseudo-Polinomial**.
   - **Problema da Mochila (Knapsack Problem).**
   - **Problema da Partição (Partition Problem).**
 ```
-
