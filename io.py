@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from algoritmos.SubsetSum import subset_sum as ss_py
 
+# --- CONFIGURAÇÃO DAS ENTRADAS ---
 def generate_array(size):
     return [random.randint(1, 50) for _ in range(size)]
 
@@ -21,6 +22,7 @@ def generate_inputs():
         "grande": generate_array(10000)
     }
 
+# --- BENCHMARKS ---
 def benchmark_python(arr, target):
     tempos = []
     for _ in range(15):
@@ -28,6 +30,9 @@ def benchmark_python(arr, target):
         ss_py(arr, target)
         end = time.time()
         tempos.append((end - start) * 1000)
+    
+    # Se houver apenas 1 item (erro raro), stdev quebra. Prevenção:
+    if len(tempos) < 2: return statistics.mean(tempos), 0.0
     return statistics.mean(tempos), statistics.stdev(tempos)
 
 def benchmark_java(arr, target):
@@ -39,6 +44,7 @@ def benchmark_java(arr, target):
     for _ in range(15):
         java_cmd = ["java", "-cp", ".", "algoritmos.SubsetSum", str(target), arr_path]
         
+        # Captura o output do Java que agora imprime o tempo exato
         result = subprocess.run(java_cmd, capture_output=True, text=True)
         
         try:
@@ -46,9 +52,12 @@ def benchmark_java(arr, target):
             tempos.append(tempo_ms)
         except ValueError:
             print(f"Erro ao ler output do Java: {result.stderr}")
+            tempos.append(0.0)
             
+    if len(tempos) < 2: return statistics.mean(tempos), 0.0
     return statistics.mean(tempos), statistics.stdev(tempos)
 
+# --- GRÁFICOS ---
 def plot_bars(resultados):
     labels = list(resultados.keys())
     py_vals = [resultados[k]['python']['mean'] for k in labels]
@@ -69,6 +78,7 @@ def plot_bars(resultados):
     ax.set_xticklabels([l.upper() for l in labels])
     ax.legend()
     
+    # Adiciona os valores nas barras
     ax.bar_label(r1, padding=3, fmt='%.1f')
     ax.bar_label(r2, padding=3, fmt='%.1f')
     
@@ -87,6 +97,7 @@ def plot_curves(dados_para_curva):
 
     Ops = N * Target 
     
+    # Ajuste da curva teórica para alinhar com o último ponto do Java
     fator_escala = Times_Java[-1] / Ops[-1] if Ops[-1] > 0 else 0
     Curva_Teorica = Ops * fator_escala
 
@@ -107,6 +118,7 @@ def plot_curves(dados_para_curva):
     print("✅ Gráfico de Curvas salvo: 'curva_complexidade.png'")
     plt.close()
 
+# --- EXECUÇÃO PRINCIPAL ---
 def run_all():
     entradas = generate_inputs()
     resultados = {}
@@ -122,8 +134,9 @@ def run_all():
         mean_py, std_py = benchmark_python(arr, target)
         mean_java, std_java = benchmark_java(arr, target)
         
-        print(f"Python: {mean_py:.2f} ms")
-        print(f"Java:   {mean_java:.2f} ms")
+        # AQUI ESTAVA FALTANDO O DESVIO PADRÃO NO PRINT
+        print(f"Python: {mean_py:.2f} ms (±{std_py:.2f})")
+        print(f"Java:   {mean_java:.2f} ms (±{std_java:.2f})")
 
         resultados[nome] = {
             'python': {'mean': mean_py, 'std': std_py},
