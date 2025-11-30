@@ -21,6 +21,9 @@ public class SubsetSum {
     }
 
     public static void main(String[] args) throws Exception {
+        if (args.length < 2) {
+            return;
+        }
         int target = Integer.parseInt(args[0]);
 
         String path = args[1];
@@ -28,18 +31,30 @@ public class SubsetSum {
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String json = br.readLine();
-            json = json.replace("[", "").replace("]", "");
-            String[] parts = json.split(",");
+            if (json != null) {
+                json = json.replace("[", "").replace("]", "");
+                String[] parts = json.split(",");
 
-            for (String p : parts) {
-                if (!p.isBlank()) {
-                    list.add(Integer.parseInt(p.trim()));
+                for (String p : parts) {
+                    if (!p.isBlank()) {
+                        list.add(Integer.parseInt(p.trim()));
+                    }
                 }
             }
         }
 
         int[] arr = list.stream().mapToInt(i -> i).toArray();
 
+        // --- BENCHMARK INTERNO (CORREÇÃO) ---
+        // Mede apenas a execução do algoritmo, ignorando o boot da JVM
+        long startTime = System.nanoTime();
+        
         subsetSum(arr, target);
+        
+        long endTime = System.nanoTime();
+        
+        // Converte para milissegundos e imprime APENAS o número para o Python ler
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+        System.out.println(durationMs);
     }
 }

@@ -41,10 +41,21 @@ def benchmark_java(arr, target):
         arr_path = f.name
 
     for _ in range(15):
-        start = time.time()
+        # O comando Java agora imprime o tempo de execução no stdout
         java_cmd = ["java", "-cp", ".", "algoritmos.SubsetSum", str(target), arr_path]
-        subprocess.run(java_cmd, stdout=subprocess.DEVNULL)
-        tempos.append((time.time() - start) * 1000)
+        
+        # capture_output=True captura o print do Java
+        # text=True garante que vem como string, não bytes
+        result = subprocess.run(java_cmd, capture_output=True, text=True)
+        
+        try:
+            # Lemos o tempo que o próprio Java calculou (precisão alta)
+            tempo_ms = float(result.stdout.strip())
+            tempos.append(tempo_ms)
+        except ValueError:
+            print(f"Erro ao ler output do Java: {result.stderr}")
+            # Retorna 0 ou trata o erro conforme necessário
+            
     return statistics.mean(tempos), statistics.stdev(tempos)
 
 # --- GRÁFICO 1: BARRAS (COMPARATIVO) ---
@@ -63,7 +74,7 @@ def plot_bars(resultados):
     r2 = ax.bar(x + width/2, java_vals, width, label='Java', yerr=java_std, capsize=5, color='#f89820')
 
     ax.set_ylabel('Tempo (ms)')
-    ax.set_title('Python vs Java: Comparação Direta')
+    ax.set_title('Python vs Java: Comparação Direta (JVM Warmup Ignorado)')
     ax.set_xticks(x)
     ax.set_xticklabels([l.upper() for l in labels])
     ax.legend()
@@ -76,7 +87,7 @@ def plot_bars(resultados):
     print("✅ Gráfico de Barras salvo: 'comparacao_tempos.png'")
     plt.close()
 
-# --- GRÁFICO 2: CURVA TEÓRICA VS PRÁTICA (NOVO!) ---
+# --- GRÁFICO 2: CURVA TEÓRICA VS PRÁTICA ---
 def plot_curves(dados_para_curva):
     # Organiza os dados pelo tamanho N (x)
     dados_sorted = sorted(dados_para_curva, key=lambda x: x['n'])
@@ -86,23 +97,17 @@ def plot_curves(dados_para_curva):
     Times_Py = np.array([d['time_py'] for d in dados_sorted])
     Times_Java = np.array([d['time_java'] for d in dados_sorted])
 
-    # A "Complexidade Teórica" é proporcional a N * Target (ou N^2 neste teste)
-    # Calculamos a "Carga de Trabalho" teórica
+    # A "Complexidade Teórica" é proporcional a N * Target
     Ops = N * Target 
     
-    # Normalização: Ajustamos a curva teórica para "encostar" no último ponto medido do Java
-    # Isso serve para ver se o formato da curva bate, não o valor absoluto.
-    fator_escala = Times_Java[-1] / Ops[-1]
+    # Normalização: Ajustamos a curva teórica para o maior valor medido (Java)
+    fator_escala = Times_Java[-1] / Ops[-1] if Ops[-1] > 0 else 0
     Curva_Teorica = Ops * fator_escala
 
     plt.figure(figsize=(10, 6))
     
-    # Plota as linhas medidas
     plt.plot(N, Times_Java, 'o-', label='Medido: Java', color='#f89820', linewidth=2)
-    plt.plot(N, Times_Py, 'o-', label='Medido: Python', color='#3776ab', linewidth=2)
-    
-    # Plota a Curva Teórica (Pontilhada)
-    # Usamos N no eixo X para visualizar o crescimento quadrático
+    plt.plot(N, Times_Py, 'o-', label='Medido: Python (NumPy)', color='#3776ab', linewidth=2)
     plt.plot(N, Curva_Teorica, '--', label='Teórico O(N*S)', color='gray', alpha=0.7)
 
     plt.xlabel('Tamanho da Entrada (N)')
@@ -136,13 +141,12 @@ def run_all():
         print(f"Python: {mean_py:.2f} ms")
         print(f"Java:   {mean_java:.2f} ms")
 
-        # Guarda dados para o Gráfico de Barras
+        # Guarda dados
         resultados[nome] = {
             'python': {'mean': mean_py, 'std': std_py},
             'java': {'mean': mean_java, 'std': std_java}
         }
         
-        # Guarda dados para o Gráfico de Curvas
         dados_curva.append({
             'n': n,
             'target': target,
