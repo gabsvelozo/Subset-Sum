@@ -1,9 +1,6 @@
 package algoritmos;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
 public class SubsetSum {
 
@@ -21,24 +18,15 @@ public class SubsetSum {
     }
 
     public static void main(String[] args) throws Exception {
-        int target = Integer.parseInt(args[0]);
+        int size = Integer.parseInt(args[0]);
+        int target = Integer.parseInt(args[1]);
 
-        String path = args[1];
-        List<Integer> list = new ArrayList<>();
+        Random r = new Random();
+        int[] arr = new int[size];
 
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String json = br.readLine();
-            json = json.replace("[", "").replace("]", "");
-            String[] parts = json.split(",");
-
-            for (String p : parts) {
-                if (!p.isBlank()) {
-                    list.add(Integer.parseInt(p.trim()));
-                }
-            }
+        for (int i = 0; i < size; i++) {
+            arr[i] = r.nextInt(size) + 1;
         }
-
-        int[] arr = list.stream().mapToInt(i -> i).toArray();
 
         subsetSum(arr, target);
     }
