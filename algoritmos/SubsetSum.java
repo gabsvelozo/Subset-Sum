@@ -45,15 +45,12 @@ public class SubsetSum {
 
         int[] arr = list.stream().mapToInt(i -> i).toArray();
 
-        // --- BENCHMARK INTERNO (CORREÇÃO) ---
-        // Mede apenas a execução do algoritmo, ignorando o boot da JVM
         long startTime = System.nanoTime();
         
         subsetSum(arr, target);
         
         long endTime = System.nanoTime();
         
-        // Converte para milissegundos e imprime APENAS o número para o Python ler
         double durationMs = (endTime - startTime) / 1_000_000.0;
         System.out.println(durationMs);
     }
