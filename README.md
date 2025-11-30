@@ -134,4 +134,3 @@ A solução apresentada é **Pseudo-Polinomial**.
 - **Problemas Semelhantes:**
   - **Problema da Mochila (Knapsack Problem).**
   - **Problema da Partição (Partition Problem).**
-```
